@@ -1,0 +1,7 @@
+netlist input을 받아
+받아서 각 노드별 transconductance를 구해
+인버스 매트릭스를 이용해서 노드별 v를 구해
+transfer function을 만들어서 gain을 구해
+이 과정을 정해진 frequency 구간에서 반복해
+csv로 작성을 해
+MATLAB으로 그려
