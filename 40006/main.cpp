@@ -1,25 +1,26 @@
 #include <iostream>
 
-#include "store.h"
+#include "canalysis.h"
 
 int main() {
+    // Initialise variables
     std::vector<Component> circuit;
     Option option;
-    std::string fileName;    
+    std::string fileName;   
+    std::string outputNode; 
 
+    // Input circuit file for analysis
     std::cout << "Circuit File : ";
     std::cin >> fileName;
 
     ReadFile(&circuit, &option, fileName);
 
-    for (int i = 0; i < circuit.size(); i++) {
-        std::cout << circuit[i].designator << " ";
-        std::cout << circuit[i].node0 << " ";
-        std::cout << circuit[i].node1 << " ";
-        std::cout << circuit[i].node2 << " ";
-        std::cout << circuit[i].node3 << " ";
-        std::cout << circuit[i].value << std::endl;
-    }
+    // PrintCircuit(circuit, option);
+
+    // Circuit Analysis Begins
+    outputNode = FindOutputNode(circuit);
+
+    std::cout << outputNode << std::endl;
 
     return 0;
 }
