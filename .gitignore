@@ -1,5 +1,2 @@
-.vs
-.vcxproj
-.vcxproj.filters.
-\40006\x64
-\x64
+.DS_Store
+.vscode/settings.json
