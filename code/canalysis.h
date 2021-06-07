@@ -4,10 +4,7 @@
 
 struct Component {
     std::string designator;
-    std::string node0;
-    std::string node1;
-    std::string node2;
-    std::string node3;
+    std::vector<std::string> nodes;
     std::string value;
 };
 
@@ -33,27 +30,45 @@ void ReadFile(std::vector<Component>* circuit, Option* option, std::string filen
     infile >> comp.designator;
 
     while (comp.designator != ".end") {
-        // std::cout << "while loop" << std::endl;
         if ((comp.designator[0] == 'V') || (comp.designator[0] == 'I') || (comp.designator[0] == 'R') || 
             (comp.designator[0] == 'C') || (comp.designator[0] == 'L') || (comp.designator[0] == 'D')) {
+            for (int i = 0; i < 2; i++) {
+                std::string val;
 
-            infile >> comp.node0 >> comp.node1 >> comp.value;
-            comp.node2 = comp.node3 = "";
+                infile >> val;
+                comp.nodes.push_back(val);
+            }
+            infile >> comp.value;
+
             circuit->push_back(comp);
         }
         else if ((comp.designator[0] == 'Q') || (comp.designator[0] == 'D')) {
-            infile >> comp.node0 >> comp.node1 >> comp.node2 >> comp.value;
-            comp.node3 = "";
+            for (int i = 0; i < 3; i++) {
+                std::string val;
+
+                infile >> val;
+                comp.nodes.push_back(val);
+            }
+            infile >> comp.value;
+
             circuit->push_back(comp);
         }
         else if (comp.designator[0] == 'G') {
-            infile >> comp.node0 >> comp.node1 >> comp.node2 >> comp.node3 >> comp.value;
+            for (int i = 0; i < 4; i++) {
+                std::string val;
+
+                infile >> val;
+                comp.nodes.push_back(val);
+            }
+            infile >> comp.value;
+
             circuit->push_back(comp);
         }
         else if (comp.designator == ".ac") {
             infile >> option->sweepType >> option->ppd >> option->startFreq >> option->endFreq;
         }
         infile >> comp.designator;
+        comp.nodes.clear();
     }
 
     infile.close();
@@ -64,10 +79,10 @@ void ReadFile(std::vector<Component>* circuit, Option* option, std::string filen
 void PrintCircuit(std::vector<Component> circuit, Option option) {
     for (int i = 0; i < circuit.size(); i++) {
         std::cout << circuit[i].designator << " ";
-        std::cout << circuit[i].node0 << " ";
-        std::cout << circuit[i].node1 << " ";
-        std::cout << circuit[i].node2 << " ";
-        std::cout << circuit[i].node3 << " ";
+
+        for (int j = 0; j < circuit[i].nodes.size(); j++) {
+            std::cout << circuit[i].nodes[j] << " ";
+        }
         std::cout << circuit[i].value << std::endl;
     }
 
@@ -81,7 +96,7 @@ std::string FindOutputNode(std::vector<Component> circuit) {
     // Assuming there to be only one transistor in the circuit for now.
     for (int i = 0; i < circuit.size(); i++) {
         if (circuit[i].designator[0] == 'Q') {
-            return circuit[i].node0;
+            return circuit[i].nodes[0];
         }
     }
     return "";
@@ -96,6 +111,23 @@ std::vector<Component> SmallSignalEquivalent(std::vector<Component> circuit) {
         if (circuit[i].designator[0] == 'V') {
             comp.designator = "";
             comp.value = "0";
+
+            SSEM.push_back(comp);
+        }
+        else if (circuit[i].designator[0] == 'I') {
+            continue;
+        }
+        else if (circuit[i].designator[0] == 'R') {
+            comp.designator = circuit[i].designator;
+            comp.nodes = circuit[i].nodes;
+            comp.value = circuit[i].value;
+
+            SSEM.push_back(comp);
+        }
+        else if (circuit[i].designator[0] == 'C') {
+            comp.designator = circuit[i].designator;
+            comp.nodes = circuit[i].nodes;
+            
         }
     }
     return SSEM;
