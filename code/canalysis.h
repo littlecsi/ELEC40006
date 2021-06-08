@@ -165,7 +165,7 @@ double ResCond(std::string value, int freq) { // Find Resistor Conductance
 
 double DioCond(std::string value, int freq) { // Find Resistor Conductance
     double Vt = 0.25e-03;
-    double Id = 0.3e-03 * exp(0.7 / Vt); // Assuming forward BIAS, V = 0.7V
+    double Id = 0.3e-06 * exp(0.7 / Vt); // Assuming forward BIAS, V = 0.7V
     return Id / Vt;
 }
 
