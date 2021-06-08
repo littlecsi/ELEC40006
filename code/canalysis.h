@@ -1,6 +1,14 @@
+#define PI 3.141592653589793238463
+
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <complex>
+#include <cmath>
+#include <math.h>
+#include <string.h>
+
+using namespace std::complex_literals;
 
 struct Component {
     std::string designator;
@@ -102,7 +110,7 @@ std::string FindOutputNode(std::vector<Component> circuit) {
     return "";
 }
 
-std::vector<Component> SmallSignalEquivalent(std::vector<Component> circuit) {
+std::vector<Component> SmallSignalEquivalent(std::vector<Component> circuit, int freq) {
     // Reads a Full Circuit and returns the Small-Signal Equivalent Circuit.
     std::vector<Component> SSEM;
 
@@ -120,16 +128,80 @@ std::vector<Component> SmallSignalEquivalent(std::vector<Component> circuit) {
         else if (circuit[i].designator[0] == 'R') {
             comp.designator = circuit[i].designator;
             comp.nodes = circuit[i].nodes;
-            comp.value = circuit[i].value;
+            comp.value = ResCond(circuit[i].value, freq);
 
             SSEM.push_back(comp);
         }
         else if (circuit[i].designator[0] == 'C') {
             comp.designator = circuit[i].designator;
             comp.nodes = circuit[i].nodes;
-            
+            comp.value = std::to_string(CapCond(circuit[i].value, freq));
+        }
+        else if (circuit[i].designator[0] == 'L') {
+            comp.designator = circuit[i].designator;
+            comp.nodes = circuit[i].nodes;
+            comp.value = std::to_string(IndCond(circuit[i].value, freq));
+        }
+        else if (circuit[i].designator[0] == 'D') {
+            comp.designator = circuit[i].designator;
+            comp.nodes = circuit[i].nodes;
+            comp.value = std::to_string(DioCond(circuit[i].value, freq));
         }
     }
     return SSEM;
 }
 
+double CapCond(std::string value, int freq) { // Find Capacitor Conductance
+    return std::real(1i * ftow(freq) * ConvertUnit(value));
+}
+
+double IndCond(std::string value, int freq) { // Find Inductor Conductance
+    return std::real(1.0 / (1i * ftow(freq) * ConvertUnit(value)));
+}
+
+double ResCond(std::string value, int freq) { // Find Resistor Conductance
+    return 1.0 / ConvertUnit(value);
+}
+
+double DioCond(std::string value, int freq) { // Find Resistor Conductance
+    double Vt = 0.25e-03;
+    double Id = 0.3e-03 * exp(0.7 / Vt); // Assuming forward BIAS, V = 0.7V
+    return Id / Vt;
+}
+
+double ConvertUnit(std::string value) {
+    // If there is no multiplier, return the value as a double
+    if ((int(value[value.size() - 1]) >= 48) && (int(value[value.size() - 1]) <= 57)) {
+        return std::stod(value);
+    }
+
+    double multiplier = 1.0;
+
+    if (value[value.size() - 1] == 'p') {
+        multiplier = 1e-12; 
+    }
+    else if (value[value.size() - 1] == 'n') {
+        multiplier = 1e-09; 
+    }
+    else if (value[value.size() - 1] == 'u') {
+        multiplier = 1e-06; 
+    }
+    else if (value[value.size() - 1] == 'm') {
+        multiplier = 1e-03; 
+    }
+    else if (value[value.size() - 1] == 'k') {
+        multiplier = 1e+03; 
+    }
+    else if (value[value.size() - 1] == 'G') {
+        multiplier = 1e+09; 
+    }
+    else if (value.substr(value.size() - 3, value.size() - 1) == "Meg") {
+        multiplier = 1e+06;
+        return (double)(multiplier * std::stoi(value.substr(0, value.size() - 3)));
+    }
+    return multiplier * std::stod(value.substr(0, value.size() - 1));
+}
+
+double ftow(int freq) { // frequency to Angular freq
+    return 2 * PI * freq;
+}
