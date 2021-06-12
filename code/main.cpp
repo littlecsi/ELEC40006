@@ -4,10 +4,16 @@
 
 int main() {
     // Initialise variables
-    std::vector<Component> circuit;
     Option option;
+
+    double transFunc;
+
+    Mat condMatrix;
+    std::vector<double> nodeCurrMat, nodeVolMat;
+    std::vector<Component> circuit;
+
     std::string fileName;   
-    std::string outputNode; 
+    std::string inputNode, outputNode;
 
     // Input circuit file for analysis
     std::cout << "Circuit File : ";
@@ -15,12 +21,32 @@ int main() {
 
     ReadFile(&circuit, &option, fileName);
 
-    // PrintCircuit(circuit, option);
+    std::cout << "Input Node (Nxxx) : ";
+    std::cin >> inputNode;
+
+    std::cout << "Output Node (Nxxx) : ";
+    std::cin >> outputNode;
 
     // Circuit Analysis Begins
-    outputNode = FindOutputNode(circuit);
+    std::ofstream outfile;
+    outfile.open("result.csv");
 
-    std::cout << outputNode << std::endl;
+    outfile << "frequency, decibels \n";
 
+    condMatrix = InitCondMat(circuit);
+    nodeCurrMat = InitNodeCurrMat(condMatrix);
+
+    for (int freq = std::stoi(option.startFreq); freq <= std::stoi(option.endFreq); freq += std::stoi(option.ppd)) {
+        condMatrix = GenerateCondMat(condMatrix, circuit, &nodeCurrMat, freq);
+
+        std::vector<std::vector<double>> inverse = getInverse(condMatrix);
+
+        nodeVolMat = getNodeVolMat(getInverse(condMatrix), nodeCurrMat);
+
+        transFunc = getTransFunc(nodeVolMat, inputNode, outputNode);
+
+        outfile << freq << ", " << transFunc << "\n";
+    }    
+    
     return 0;
 }
