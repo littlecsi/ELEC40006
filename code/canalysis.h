@@ -41,6 +41,16 @@ std::vector<std::string> ConvertNode(std::vector<std::string>);
 Mat GenerateCondMat(Mat, std::vector<Component>, int);
 Mat InitCondMat(std::vector<Component>);
 double ftow(int);
+Mat InitCondMat(const std::vector<Component>);
+std::vector<double> InitNodeCurrMat(Mat);
+double getDeterminant(Mat);
+Mat getTranspose(const Mat matrix1);
+Mat getCofactor(const Mat vect);
+Mat getInverse(Mat vect);
+std::vector<double> getNodeVolMat(Mat, std::vector<double>);
+double getTransFunc(std::vector<double>, std::string, std::string);
+void printMatrix(Mat);
+void printMatrix(std::vector<double>);
 // ------------------------------------------------------------
 
 void ReadFile(std::vector<Component>* circuit, Option* option, std::string filename) {
@@ -356,7 +366,7 @@ std::vector<double> InitNodeCurrMat(Mat condMatrix) {
     return nodeCurrMat;
 }
 
-double getDeterminant(std::vector<std::vector<double>> vect) {
+double getDeterminant(Mat vect) {
     int dimension = vect.size();
 
     // Formula for 2x2-matrix
@@ -389,7 +399,7 @@ double getDeterminant(std::vector<std::vector<double>> vect) {
     return result;
 }
 
-std::vector<std::vector<double>> getTranspose(const std::vector<std::vector<double>> matrix1) {
+Mat getTranspose(const Mat matrix1) {
     // Transpose-matrix: height = width(matrix), width = height(matrix)
     std::vector<std::vector<double>> solution(matrix1[0].size(), std::vector<double> (matrix1.size()));
 
@@ -402,7 +412,7 @@ std::vector<std::vector<double>> getTranspose(const std::vector<std::vector<doub
     return solution;
 }
 
-std::vector<std::vector<double>> getCofactor(const std::vector<std::vector<double>> vect) {
+Mat getCofactor(const Mat vect) {
     std::vector<std::vector<double>> solution(vect.size(), std::vector<double> (vect.size()));
     std::vector<std::vector<double>> subVect(vect.size() - 1, std::vector<double> (vect.size() - 1));
 
@@ -432,7 +442,7 @@ std::vector<std::vector<double>> getCofactor(const std::vector<std::vector<doubl
     return solution;
 }
 
-std::vector<std::vector<double>> getInverse(std::vector<std::vector<double>> vect) {
+Mat getInverse(Mat vect) {
     std::cout << "checkpoint 2" << std::endl;
     if(getDeterminant(vect) == 0) {
         std::cout << "determinant is 0" << std::endl;
@@ -458,7 +468,7 @@ std::vector<std::vector<double>> getInverse(std::vector<std::vector<double>> vec
     return solution;
 }
 
-std::vector<double> getNodeVolMat(std::vector<std::vector<double>> invMat, std::vector<double> currMat) {
+std::vector<double> getNodeVolMat(Mat invMat, std::vector<double> currMat) {
     std::vector<double> nodeVolMat;
     
     for (int i = 0; i < currMat.size(); i++) {
@@ -479,7 +489,7 @@ double getTransFunc(std::vector<double> nodeVolMat, std::string inputNode, std::
     return 20.0 * (log(nodeVolMat[n1] / nodeVolMat[n0]) / log(10));
 }
 
-void printMatrix(std::vector<std::vector<double>> matrix) {
+void printMatrix(Mat matrix) {
     for (int i = 0; i < matrix.size(); i++) {
         for (int j = 0; j < matrix[i].size(); j++) {
             std::cout << matrix[i][j] << " ";
