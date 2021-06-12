@@ -504,12 +504,3 @@ void printMatrix(std::vector<double> matrix) {
     }
     std::cout << std::endl;
 }
-
-
-
-
-
-
-
-
-
