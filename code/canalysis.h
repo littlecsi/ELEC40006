@@ -443,9 +443,7 @@ Mat getCofactor(const Mat vect) {
 }
 
 Mat getInverse(Mat vect) {
-    std::cout << "checkpoint 2" << std::endl;
     if(getDeterminant(vect) == 0) {
-        std::cout << "determinant is 0" << std::endl;
         throw std::runtime_error("Determinant is 0");
     }
 

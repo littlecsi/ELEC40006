@@ -46,7 +46,7 @@ int main() {
         transFunc = getTransFunc(nodeVolMat, inputNode, outputNode);
 
         outfile << freq << ", " << transFunc << "\n";
-    }    
+    }
     
     return 0;
 }
