@@ -36,7 +36,7 @@ int main() {
     condMatrix = InitCondMat(circuit);
     nodeCurrMat = InitNodeCurrMat(condMatrix);
 
-    for (int freq = std::stoi(option.startFreq); freq <= std::stoi(option.endFreq); freq += std::stoi(option.ppd)) {
+    for (int freq = std::stoi(option.startFreq); freq <= ConvertUnit(option.endFreq); freq += std::stoi(option.ppd)) {
         condMatrix = GenerateCondMat(condMatrix, circuit, &nodeCurrMat, freq);
 
         std::vector<std::vector<double>> inverse = getInverse(condMatrix);
